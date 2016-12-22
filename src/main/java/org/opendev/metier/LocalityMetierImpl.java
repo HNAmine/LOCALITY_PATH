@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class LocalityMetierImpl implements LocalityMetier {
 
+	final double RATE_PROXIMITY = 0;
+
 	@Autowired
 	LocalityRepository localityRepository;
 
@@ -43,7 +45,8 @@ public class LocalityMetierImpl implements LocalityMetier {
 
 			for (Iterator<Locality> iter = localities.iterator(); iter.hasNext();) {
 				Locality locality = iter.next();
-				if (a * locality.getAltitude() + b == locality.getLongitude()) {
+				if ((a * locality.getAltitude() + b - locality.getLongitude() == RATE_PROXIMITY)
+						&& isPointBetweenStep(locality, step)) {
 					localitiesInPath.add(locality);
 					iter.remove();
 				}
@@ -51,6 +54,20 @@ public class LocalityMetierImpl implements LocalityMetier {
 		});
 
 		return localitiesInPath;
+	}
+
+	private boolean isPointBetweenStep(Locality locality, StepDto step) {
+
+		double maxLat = Math.max(step.getStart_location().getLat(), step.getEnd_location().getLat());
+		double minLat = Math.min(step.getStart_location().getLat(), step.getEnd_location().getLat());
+		double maxLng = Math.max(step.getStart_location().getLng(), step.getEnd_location().getLng());
+		double minLng = Math.min(step.getStart_location().getLng(), step.getEnd_location().getLng());
+
+		if (locality.getAltitude() >= minLat && locality.getAltitude() <= maxLat && locality.getLongitude() >= minLng
+				&& locality.getLongitude() <= maxLng) {
+			return true;
+		}
+		return false;
 	}
 
 }

@@ -33,11 +33,16 @@ public class LocalityRestService {
 		return builder.build();
 	}
 
-	@RequestMapping(value = "/path", method = RequestMethod.POST)
+	@RequestMapping(value = "/pointsInPath", method = RequestMethod.POST)
 	public List<Locality> getAllLocalitiesInPath(@RequestBody StepDto stepDto, RestTemplate restTemplate) {
 		return localityMetier.getAllLocalitiesInPath(stepDto, restTemplate);
 	}
 
+	/*
+	 * 
+	 * CRUD API FOR LOCALITIES
+	 *
+	 */
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public Locality addLocality(@RequestBody Locality locality) {
 		return localityRepository.saveAndFlush(locality);
