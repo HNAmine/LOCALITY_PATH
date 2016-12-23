@@ -32,26 +32,27 @@ public class LocalityMetierImpl implements LocalityMetier {
 		List<Locality> localitiesInPath = new ArrayList<>();
 		List<Locality> localities = this.localityRepository.findAll();
 
-		reponse.getRoutes().get(0).getLegs().get(0).getSteps().forEach(step -> {
+		if (reponse.getRoutes().size() > 0)
+			reponse.getRoutes().get(0).getLegs().get(0).getSteps().forEach(step -> {
 
-			double deltaLat = step.getEnd_location().getLat() - step.getStart_location().getLat();
-			double deltaLng = step.getEnd_location().getLng() - step.getStart_location().getLng();
+				double deltaLat = step.getEnd_location().getLat() - step.getStart_location().getLat();
+				double deltaLng = step.getEnd_location().getLng() - step.getStart_location().getLng();
 
-			// Y = AX + B
-			// A
-			double a = (deltaLat > 0) ? (deltaLng) / (deltaLat) : 0;
-			// B
-			double b = -1 * a * step.getStart_location().getLat() + step.getStart_location().getLng();
+				// Y = AX + B
+				// A
+				double a = (deltaLat > 0) ? (deltaLng) / (deltaLat) : 0;
+				// B
+				double b = -1 * a * step.getStart_location().getLat() + step.getStart_location().getLng();
 
-			for (Iterator<Locality> iter = localities.iterator(); iter.hasNext();) {
-				Locality locality = iter.next();
-				if ((a * locality.getAltitude() + b - locality.getLongitude() == RATE_PROXIMITY)
-						&& isPointBetweenStep(locality, step)) {
-					localitiesInPath.add(locality);
-					iter.remove();
+				for (Iterator<Locality> iter = localities.iterator(); iter.hasNext();) {
+					Locality locality = iter.next();
+					if ((a * locality.getAltitude() + b - locality.getLongitude() == RATE_PROXIMITY)
+							&& isPointBetweenStep(locality, step)) {
+						localitiesInPath.add(locality);
+						iter.remove();
+					}
 				}
-			}
-		});
+			});
 
 		return localitiesInPath;
 	}
